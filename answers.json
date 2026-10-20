@@ -1,0 +1,815 @@
+{
+ "A5": {
+  "status": "unique",
+  "title": "Race results",
+  "check": "exact",
+  "solution": {
+   "Anna": 3,
+   "Bohdan": 4,
+   "Kira": 1,
+   "Dmytro": 2
+  }
+ },
+ "A4": {
+  "status": "unique",
+  "title": "Knights and knaves (3)",
+  "check": "exact",
+  "solution": {
+   "Anya": "knight",
+   "Borys": "knave",
+   "Vika": "knave"
+  }
+ },
+ "A2": {
+  "status": "none",
+  "title": "Exam timetable",
+  "check": "status"
+ },
+ "A3": {
+  "status": "unique",
+  "title": "Meetup talks",
+  "check": "exact",
+  "solution": {
+   "1": {
+    "Speaker": "Orest",
+    "Topic": "testing",
+    "Format": "workshop",
+    "Language": "English"
+   },
+   "2": {
+    "Speaker": "Liana",
+    "Topic": "UX",
+    "Format": "lecture",
+    "Language": "Polish"
+   },
+   "3": {
+    "Speaker": "Marko",
+    "Topic": "security",
+    "Format": "demo",
+    "Language": "German"
+   },
+   "4": {
+    "Speaker": "Nadiia",
+    "Topic": "databases",
+    "Format": "panel",
+    "Language": "Ukrainian"
+   }
+  }
+ },
+ "A1": {
+  "status": "unique",
+  "title": "Five offices",
+  "check": "exact",
+  "solution": {
+   "1": {
+    "Name": "Dmytro",
+    "Language": "Java",
+    "Editor": "IntelliJ",
+    "Drink": "water",
+    "OS": "ChromeOS"
+   },
+   "2": {
+    "Name": "Anton",
+    "Language": "Go",
+    "Editor": "Zed",
+    "Drink": "kefir",
+    "OS": "FreeBSD"
+   },
+   "3": {
+    "Name": "Yevhen",
+    "Language": "Rust",
+    "Editor": "Emacs",
+    "Drink": "coffee",
+    "OS": "macOS"
+   },
+   "4": {
+    "Name": "Vira",
+    "Language": "Kotlin",
+    "Editor": "VS Code",
+    "Drink": "tea",
+    "OS": "Linux"
+   },
+   "5": {
+    "Name": "Bohdana",
+    "Language": "Python",
+    "Editor": "Vim",
+    "Drink": "cocoa",
+    "OS": "Windows"
+   }
+  }
+ },
+ "B5": {
+  "status": "unique",
+  "title": "Drinks",
+  "check": "exact",
+  "solution": {
+   "Olena": "coffee",
+   "Petro": "juice",
+   "Maria": "tea"
+  }
+ },
+ "B4": {
+  "status": "unique",
+  "title": "Siblings' ages",
+  "check": "exact",
+  "solution": {
+   "Ivan": 17,
+   "Kateryna": 14,
+   "Taras": 7,
+   "Sofiia": 5
+  }
+ },
+ "B1": {
+  "status": "multiple",
+  "title": "Canteen queue",
+  "check": "status",
+  "n_solutions_found": 3,
+  "solutions": [
+   {
+    "Artem": 3,
+    "Bohdana": 2,
+    "Viktor": 1,
+    "Halyna": 4,
+    "Dmytro": 5
+   },
+   {
+    "Artem": 5,
+    "Bohdana": 4,
+    "Viktor": 2,
+    "Halyna": 3,
+    "Dmytro": 1
+   },
+   {
+    "Artem": 4,
+    "Bohdana": 3,
+    "Viktor": 1,
+    "Halyna": 2,
+    "Dmytro": 5
+   }
+  ]
+ },
+ "B3": {
+  "status": "unique",
+  "title": "Meeting week",
+  "check": "exact",
+  "solution": {
+   "Planning": "Mon morning",
+   "Design review": "Mon afternoon",
+   "Budget": "Tue morning",
+   "Hiring": "Tue afternoon",
+   "Security review": "Wed morning",
+   "Retro": "Wed afternoon"
+  }
+ },
+ "B2": {
+  "status": "unique",
+  "title": "Cryptarithm",
+  "check": "exact",
+  "solution": {
+   "N": 5,
+   "O": 7,
+   "D": 2,
+   "E": 8,
+   "G": 1,
+   "R": 3,
+   "A": 9,
+   "P": 4,
+   "H": 6
+  }
+ },
+ "C5": {
+  "status": "unique",
+  "title": "Parcel delivery",
+  "check": "exact",
+  "solution": {
+   "Liubov": "10:00",
+   "Mykola": "9:00",
+   "Nazar": "11:00"
+  }
+ },
+ "C1": {
+  "status": "unique",
+  "title": "Knights and knaves (3)",
+  "check": "exact",
+  "solution": {
+   "Olha": "knight",
+   "Pylyp": "knight",
+   "Rostyslav": "knave"
+  }
+ },
+ "C4": {
+  "status": "unique",
+  "title": "Days off",
+  "check": "exact",
+  "solution": {
+   "Andrii": "Tuesday",
+   "Bohdana": "Monday",
+   "Vasyl": "Friday",
+   "Hanna": "Wednesday",
+   "Denys": "Thursday"
+  }
+ },
+ "C3": {
+  "status": "unique",
+  "title": "Round table",
+  "check": "exact",
+  "solution": {
+   "Iryna": 1,
+   "Kostiantyn": 4,
+   "Liudmyla": 3,
+   "Mykhailo": 5,
+   "Nataliia": 2,
+   "Orest": 6
+  }
+ },
+ "C2": {
+  "status": "optimal",
+  "title": "Release planning (optimization)",
+  "objective": 32,
+  "check": "exact_optimum",
+  "solution": {
+   "build": [
+    "Dark mode",
+    "Full-text search",
+    "Real-time sync",
+    "Single sign-on (SSO)",
+    "Two-factor authentication (2FA)"
+   ]
+  },
+  "aliases": {
+   "Single sign-on (SSO)": [
+    "single sign-on",
+    "sso"
+   ],
+   "Two-factor authentication (2FA)": [
+    "two-factor authentication",
+    "2fa"
+   ],
+   "Full-text search": [
+    "search"
+   ],
+   "Real-time sync": [
+    "sync"
+   ],
+   "Offline mode": [
+    "offline"
+   ],
+   "Public API": [
+    "api"
+   ],
+   "Rate limiting": [
+    "rate limit"
+   ],
+   "Audit log": [
+    "audit"
+   ],
+   "Dark mode": [
+    "dark"
+   ],
+   "CSV export": [
+    "csv"
+   ]
+  }
+ },
+ "D4": {
+  "status": "unique",
+  "title": "Bookshelf",
+  "check": "exact",
+  "solution": {
+   "Dictionary": 2,
+   "Atlas": 1,
+   "Novel": 3,
+   "Cookbook": 4
+  }
+ },
+ "D2": {
+  "status": "unique",
+  "title": "Four houses",
+  "check": "exact",
+  "solution": {
+   "1": {
+    "Name": "Yurii",
+    "Pet": "cat",
+    "Door": "green"
+   },
+   "2": {
+    "Name": "Ivan",
+    "Pet": "dog",
+    "Door": "blue"
+   },
+   "3": {
+    "Name": "Zlata",
+    "Pet": "rabbit",
+    "Door": "yellow"
+   },
+   "4": {
+    "Name": "Kateryna",
+    "Pet": "turtle",
+    "Door": "red"
+   }
+  }
+ },
+ "D5": {
+  "status": "unique",
+  "title": "Class photo",
+  "check": "exact",
+  "solution": {
+   "Yaryna": 5,
+   "Zakhar": 3,
+   "Ilko": 4,
+   "Kyrylo": 6,
+   "Lada": 2,
+   "Marko": 1
+  }
+ },
+ "D1": {
+  "status": "unique",
+  "title": "Knights and knaves (5)",
+  "check": "exact",
+  "solution": {
+   "Alla": "knave",
+   "Bohdan": "knight",
+   "Vitalii": "knave",
+   "Hanna": "knave",
+   "Dariia": "knave"
+  }
+ },
+ "D3": {
+  "status": "unique",
+  "title": "Parking lot",
+  "check": "exact",
+  "solution": {
+   "1": {
+    "Name": "Maksym",
+    "Car": "red",
+    "Topic": "security",
+    "Pet": "fish",
+    "Hobby": "painting"
+   },
+   "2": {
+    "Name": "Halyna",
+    "Car": "green",
+    "Topic": "graphs",
+    "Pet": "dog",
+    "Hobby": "climbing"
+   },
+   "3": {
+    "Name": "Lesia",
+    "Car": "black",
+    "Topic": "robotics",
+    "Pet": "cat",
+    "Hobby": "chess"
+   },
+   "4": {
+    "Name": "Ihor",
+    "Car": "blue",
+    "Topic": "NLP",
+    "Pet": "parrot",
+    "Hobby": "guitar"
+   },
+   "5": {
+    "Name": "Nina",
+    "Car": "white",
+    "Topic": "vision",
+    "Pet": "hamster",
+    "Hobby": "running"
+   }
+  }
+ },
+ "E5": {
+  "status": "unique",
+  "title": "Three siblings",
+  "check": "exact",
+  "solution": {
+   "Oleh": 7,
+   "Polina": 10,
+   "Serhii": 4
+  }
+ },
+ "E3": {
+  "status": "unique",
+  "title": "Ticket queue",
+  "check": "exact",
+  "solution": {
+   "Klara": 5,
+   "Leonid": 1,
+   "Myroslava": 4,
+   "Nazar": 2,
+   "Oksen": 3
+  }
+ },
+ "E1": {
+  "status": "none",
+  "title": "Four boxes",
+  "check": "status"
+ },
+ "E4": {
+  "status": "unique",
+  "title": "Duty roster",
+  "check": "exact",
+  "solution": {
+   "Monday": {
+    "Name": "Danylo",
+    "Task": "printer",
+    "Snack": "apples"
+   },
+   "Tuesday": {
+    "Name": "Hlafira",
+    "Task": "plants",
+    "Snack": "cheese"
+   },
+   "Wednesday": {
+    "Name": "Vlas",
+    "Task": "inventory",
+    "Snack": "nuts"
+   },
+   "Thursday": {
+    "Name": "Arsen",
+    "Task": "mail",
+    "Snack": "cookies"
+   },
+   "Friday": {
+    "Name": "Bozhena",
+    "Task": "backups",
+    "Snack": "pastries"
+   }
+  }
+ },
+ "E2": {
+  "status": "unique",
+  "title": "Dormitory",
+  "check": "exact",
+  "solution": {
+   "1": {
+    "Name": "Svitlana",
+    "Major": "law",
+    "City": "Lviv",
+    "Instrument": "drums",
+    "Sport": "boxing"
+   },
+   "2": {
+    "Name": "Roman",
+    "Major": "medicine",
+    "City": "Chernihiv",
+    "Instrument": "bandura",
+    "Sport": "swimming"
+   },
+   "3": {
+    "Name": "Taras",
+    "Major": "economics",
+    "City": "Poltava",
+    "Instrument": "piano",
+    "Sport": "volleyball"
+   },
+   "4": {
+    "Name": "Pavlo",
+    "Major": "history",
+    "City": "Sumy",
+    "Instrument": "flute",
+    "Sport": "football"
+   },
+   "5": {
+    "Name": "Oksana",
+    "Major": "physics",
+    "City": "Odesa",
+    "Instrument": "violin",
+    "Sport": "tennis"
+   }
+  }
+ },
+ "F4": {
+  "status": "unique",
+  "title": "Umbrellas",
+  "check": "exact",
+  "solution": {
+   "Roksolana": "red",
+   "Stepan": "green",
+   "Tetiana": "blue"
+  }
+ },
+ "F2": {
+  "status": "unique",
+  "title": "Publication years",
+  "check": "exact",
+  "solution": {
+   "Poetry": 2009,
+   "Biography": 2004,
+   "Novel": 2001,
+   "Essays": 2020,
+   "Memoir": 2013
+  }
+ },
+ "F5": {
+  "status": "multiple",
+  "title": "Cinema seats",
+  "check": "status",
+  "n_solutions_found": 3,
+  "solutions": [
+   {
+    "1": {
+     "Name": "Marianna",
+     "Snack": "chips",
+     "Genre": "sci-fi"
+    },
+    "2": {
+     "Name": "Lukiian",
+     "Snack": "popcorn",
+     "Genre": "horror"
+    },
+    "3": {
+     "Name": "Nazar",
+     "Snack": "nachos",
+     "Genre": "drama"
+    },
+    "4": {
+     "Name": "Olesia",
+     "Snack": "candy",
+     "Genre": "comedy"
+    }
+   },
+   {
+    "1": {
+     "Name": "Marianna",
+     "Snack": "chips",
+     "Genre": "sci-fi"
+    },
+    "2": {
+     "Name": "Nazar",
+     "Snack": "nachos",
+     "Genre": "drama"
+    },
+    "3": {
+     "Name": "Olesia",
+     "Snack": "candy",
+     "Genre": "comedy"
+    },
+    "4": {
+     "Name": "Lukiian",
+     "Snack": "popcorn",
+     "Genre": "horror"
+    }
+   },
+   {
+    "1": {
+     "Name": "Lukiian",
+     "Snack": "popcorn",
+     "Genre": "horror"
+    },
+    "2": {
+     "Name": "Marianna",
+     "Snack": "chips",
+     "Genre": "sci-fi"
+    },
+    "3": {
+     "Name": "Nazar",
+     "Snack": "nachos",
+     "Genre": "drama"
+    },
+    "4": {
+     "Name": "Olesia",
+     "Snack": "candy",
+     "Genre": "comedy"
+    }
+   }
+  ]
+ },
+ "F3": {
+  "status": "unique",
+  "title": "Apartment building",
+  "check": "exact",
+  "solution": {
+   "1": {
+    "Name": "Raisa",
+    "Profession": "pilot",
+    "Car": "Volvo",
+    "Plant": "fern"
+   },
+   "2": {
+    "Name": "Sofiia",
+    "Profession": "teacher",
+    "Car": "Kia",
+    "Plant": "orchid"
+   },
+   "3": {
+    "Name": "Trokhym",
+    "Profession": "architect",
+    "Car": "Toyota",
+    "Plant": "ficus"
+   },
+   "4": {
+    "Name": "Petro",
+    "Profession": "doctor",
+    "Car": "Skoda",
+    "Plant": "cactus"
+   }
+  }
+ },
+ "F1": {
+  "status": "optimal",
+  "title": "Radio frequencies (minimisation)",
+  "objective": 4,
+  "check": "coloring",
+  "example_solution": {
+   "Kyiv": 1,
+   "Zhytomyr": 2,
+   "Vinnytsia": 3,
+   "Cherkasy": 2,
+   "Chernihiv": 4,
+   "Poltava": 3,
+   "Sumy": 2,
+   "Uman": 1
+  },
+  "edges": [
+   [
+    "Kyiv",
+    "Zhytomyr"
+   ],
+   [
+    "Kyiv",
+    "Vinnytsia"
+   ],
+   [
+    "Kyiv",
+    "Cherkasy"
+   ],
+   [
+    "Kyiv",
+    "Poltava"
+   ],
+   [
+    "Kyiv",
+    "Chernihiv"
+   ],
+   [
+    "Zhytomyr",
+    "Vinnytsia"
+   ],
+   [
+    "Vinnytsia",
+    "Cherkasy"
+   ],
+   [
+    "Cherkasy",
+    "Poltava"
+   ],
+   [
+    "Poltava",
+    "Chernihiv"
+   ],
+   [
+    "Chernihiv",
+    "Zhytomyr"
+   ],
+   [
+    "Sumy",
+    "Poltava"
+   ],
+   [
+    "Sumy",
+    "Chernihiv"
+   ],
+   [
+    "Uman",
+    "Vinnytsia"
+   ],
+   [
+    "Uman",
+    "Cherkasy"
+   ]
+  ]
+ },
+ "G1": {
+  "status": "unique",
+  "title": "Three cities",
+  "check": "exact",
+  "solution": {
+   "Ulyana": "Kyiv",
+   "Fedir": "Lviv",
+   "Khrystyna": "Kharkiv"
+  }
+ },
+ "G4": {
+  "status": "unique",
+  "title": "Cousins' ages",
+  "check": "exact",
+  "solution": {
+   "Anhelina": 14,
+   "Borys": 17,
+   "Valeriia": 8,
+   "Hryhorii": 5,
+   "Diana": 11
+  }
+ },
+ "G3": {
+  "status": "unique",
+  "title": "Report deadlines",
+  "check": "exact",
+  "solution": {
+   "Finance": "February",
+   "HR": "March",
+   "Sales": "January",
+   "Legal": "April"
+  }
+ },
+ "G5": {
+  "status": "unique",
+  "title": "Family ages",
+  "check": "exact",
+  "solution": {
+   "Paraska": 58,
+   "Raisa": 36,
+   "Semen": 44,
+   "Tymofii": 12,
+   "Uliana": 6
+  }
+ },
+ "G2": {
+  "status": "unique",
+  "title": "Knights and knaves (6)",
+  "check": "exact",
+  "solution": {
+   "Ivanna": "knight",
+   "Kostiantyn": "knave",
+   "Lesia": "knight",
+   "Marta": "knight",
+   "Nestor": "knave",
+   "Orysia": "knave"
+  }
+ },
+ "H5": {
+  "status": "unique",
+  "title": "Laptops",
+  "check": "exact",
+  "solution": {
+   "Vlad": "Dell",
+   "Yana": "ThinkPad",
+   "Zoriana": "MacBook"
+  }
+ },
+ "H4": {
+  "status": "unique",
+  "title": "Knights and knaves (3)",
+  "check": "exact",
+  "solution": {
+   "Taisiia": "knave",
+   "Ustym": "knight",
+   "Fedora": "knave"
+  }
+ },
+ "H3": {
+  "status": "unique",
+  "title": "Bug fixing",
+  "check": "exact",
+  "solution": {
+   "Bohdan": 2,
+   "Vira": 1,
+   "Hlib": 3,
+   "Daryna": 4
+  }
+ },
+ "H2": {
+  "status": "unique",
+  "title": "Train carriages",
+  "check": "exact",
+  "solution": {
+   "1": {
+    "Name": "Tsvitana",
+    "Destination": "Uzhhorod",
+    "Luggage": "duffel bag",
+    "Book": "thriller"
+   },
+   "2": {
+    "Name": "Kharyton",
+    "Destination": "Lviv",
+    "Luggage": "backpack",
+    "Book": "poetry"
+   },
+   "3": {
+    "Name": "Ustyna",
+    "Destination": "Kyiv",
+    "Luggage": "suitcase",
+    "Book": "history"
+   },
+   "4": {
+    "Name": "Filip",
+    "Destination": "Dnipro",
+    "Luggage": "guitar case",
+    "Book": "fantasy"
+   }
+  }
+ },
+ "H1": {
+  "status": "unique",
+  "title": "Project week schedule",
+  "check": "exact",
+  "solution": {
+   "Kickoff": "Mon morning",
+   "Hiring": "Mon afternoon",
+   "Architecture": "Tue morning",
+   "Demo": "Tue afternoon",
+   "Marketing": "Wed morning",
+   "Legal": "Wed afternoon",
+   "Wrap-up": "Thu afternoon"
+  }
+ }
+}
