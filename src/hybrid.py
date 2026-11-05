@@ -58,6 +58,44 @@ FORMALIZER_PROMPT = """Translate the puzzle below into the IR format. Do not sol
 
 {ir_spec}
 
+Rules:
+1. Make one variable per entity that must be placed or measured (a person, an item, a letter, an event).
+   Its value is what the puzzle asks for: a position, a slot number, a digit, an amount.
+2. If entities are matched with labels (for example people with drinks), the variable is the entity and its value
+   is the number of the label. Number the labels 1, 2, 3, ... in the order they are mentioned in the puzzle.
+   The same rule applies to ordered slots (days, time slots): number them 1, 2, 3, ... in time order.
+3. If the puzzle says that entities take different values, add them to all_different.
+4. Write every condition of the puzzle as a separate constraint, exactly as stated. Do not invent conditions.
+5. Also write down facts that the text relies on but does not state (the order of days, what "last", "between"
+   or "directly after" mean, that a leading digit is not 0, the total number of slots, and so on).
+6. Encodings: "A is directly behind B" -> "A == B + 1"; "A is before B" -> "A < B"; "A or B" ->
+   "(X == 1) or (Y == 1)"; a multi-digit number with digits a, b, c -> "100*a + 10*b + c"; a statement S made by a
+   person P who is either a knight (always true) or a knave (always false) -> "P == (S)" with knight = 1, knave = 0.
+7. Use only the syntax listed above: "==" for equality, no "=", no words, no strings, no function except abs().
+8. A domain [lo, hi] is a range of exactly two numbers, for example [1, 5]. To list allowed values use {{"values": [1, 2, 4]}}. Never write a list of three or more numbers directly.
+
+Examples:
+
+Example 1.
+Puzzle: Three trains leave from platforms 1, 2 and 3: an intercity, a regional and an express, one per platform. The express does not leave from platform 1. The regional leaves from a platform with a lower number than the intercity. The intercity does not leave from platform 3.
+IR:
+{{
+  "variables": {{"Intercity": [1, 3], "Regional": [1, 3], "Express": [1, 3]}},
+  "all_different": [["Intercity", "Regional", "Express"]],
+  "constraints": ["Express != 1", "Regional < Intercity", "Intercity != 3"]
+}}
+
+Example 2.
+Puzzle: Ann and Ben each own a different pet, a cat or a dog. Ann does not own the cat.
+IR (labels numbered in the order they are mentioned: cat = 1, dog = 2):
+{{
+  "variables": {{"Ann": [1, 2], "Ben": [1, 2]}},
+  "all_different": [["Ann", "Ben"]],
+  "constraints": ["Ann != 1"]
+}}
+
+Now the real puzzle. Answer with the IR JSON only.
+
 Puzzle:
 {text}
 {feedback}"""
