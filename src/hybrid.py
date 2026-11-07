@@ -85,13 +85,15 @@ IR:
   "constraints": ["Express != 1", "Regional < Intercity", "Intercity != 3"]
 }}
 
-Example 2.
-Puzzle: Ann and Ben each own a different pet, a cat or a dog. Ann does not own the cat.
-IR (labels numbered in the order they are mentioned: cat = 1, dog = 2):
+Example 2 (with explicit domain and optimization):
+Variables with values only from a given list:
+{{"variables": {{"Year": {{"values": [1998, 2003, 2011]}}}}
+
+Choosing items within a budget: each variable 0 or 1 means "do not take / take".
 {{
-  "variables": {{"Ann": [1, 2], "Ben": [1, 2]}},
-  "all_different": [["Ann", "Ben"]],
-  "constraints": ["Ann != 1"]
+  "variables": {{"Tent": [0, 1], "Stove": [0, 1], "Camera": [0, 1]}},
+  "constraints": ["4*Tent + 3*Stove + 5*Camera <= 8"],
+  "objective": {{"maximize": "7*Tent + 4*Stove + 6*Camera"}}
 }}
 
 Now the real puzzle. Answer with the IR JSON only.
@@ -108,6 +110,8 @@ def formalize(problem: dict, feedback: Optional[str] = None) -> dict:
     parsed, raw = llm.ask_json(prompt, IRModel, system=SYSTEM)
     return parsed.model_dump(exclude_none=True)
 
+def is_int(x) -> bool:
+    return isinstance(x, int) and not isinstance(x, bool)
 
 def validate_ir(ir: dict) -> list:
     """Return a list of human-readable error messages; an empty list means the IR is valid.
@@ -119,7 +123,78 @@ def validate_ir(ir: dict) -> list:
     Hint: ir_solver.build(ir) raises ValueError with a readable message for unknown variables and
     unsupported syntax - you can call it inside try/except and turn the exception into an error message.
     """
-    return []
+    errors = []
+    if not isinstance(ir, dict):
+        return ["the IR must be a JSON object"]
+    variables = ir.get("variables")
+    if not isinstance(variables, dict) or not variables:
+        return ['"variables" must be a non-empty object {name: domain}']
+
+    for name, dom in variables.items():
+        if not re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$").match(name):
+            errors.append(f"variable name {name!r} is not an identifier")
+        if isinstance(dom, list):
+            if len(dom) != 2 or not all(is_int(x) for x in dom):
+                errors.append(f"domain of {name} must be [lo, hi] with exactly two integers, got {dom!r}; "
+                              'write the range as [smallest, largest], e.g. [1, 3], or use {"values": [1, 2, 3]}')
+            elif dom[0] > dom[1]:
+                errors.append(f"domain of {name} is empty: lo {dom[0]} is greater than hi {dom[1]}")
+        elif isinstance(dom, dict):
+            vals = dom.get("values")
+            if not isinstance(vals, list) or not vals or not all(is_int(x) for x in vals):
+                errors.append(f'domain of {name} must be {{"values": [integers]}}, got {dom!r}')
+        else:
+            errors.append(f"domain of {name} must be [lo, hi] or " + '{"values": [...]}' + f", got {dom!r}")
+
+    groups = ir.get("all_different", [])
+    if not isinstance(groups, list):
+        errors.append('"all_different" must be a list of lists of variable names')
+    else:
+        for grp in groups:
+            if not isinstance(grp, list) or not all(isinstance(g, str) for g in grp):
+                errors.append(f"all_different group {grp!r} must be a list of variable names")
+                continue
+            for g in grp:
+                if g not in variables:
+                    errors.append(f"all_different uses unknown variable: {g}")
+
+    cons = ir.get("constraints", [])
+    if not isinstance(cons, list):
+        errors.append('"constraints" must be a list of strings')
+        cons = []
+    if errors:
+        return errors
+
+    base = {"variables": variables}
+    for c in cons:
+        if not isinstance(c, str):
+            errors.append(f"constraint {c!r} must be a string")
+            continue
+        try:
+            ir_solver.build({**base, "constraints": [c]})
+        except ValueError as e:
+            errors.append(f"constraint {c!r}: {e}")
+        except SyntaxError:
+            errors.append(f"constraint {c!r}: invalid syntax (use == for equality; only numbers, variables, "
+                          "+ - * // %, comparisons, and/or/not, abs() and parentheses are allowed)")
+        except Exception as e:  # noqa: BLE001
+            errors.append(f"constraint {c!r}: {e.__class__.__name__}: {e}")
+
+    obj = ir.get("objective")
+    if obj is not None:
+        if not (isinstance(obj, dict) and len(obj) == 1 and next(iter(obj)) in ("maximize", "minimize")
+                and isinstance(next(iter(obj.values())), str)):
+            errors.append('"objective" must be {"maximize": "<expression>"} or {"minimize": "<expression>"}')
+        else:
+            expr = next(iter(obj.values()))
+            try:
+                _, _, conv = ir_solver.build(base)
+                conv(ast.parse(expr, mode="eval"))
+            except ValueError as e:
+                errors.append(f"objective {expr!r}: {e}")
+            except SyntaxError:
+                errors.append(f"objective {expr!r}: invalid syntax")
+    return errors
 
 
 def run_solver(ir: dict) -> dict:
