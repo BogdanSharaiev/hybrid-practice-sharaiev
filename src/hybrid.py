@@ -12,7 +12,9 @@ Suggested order of work:
 
 See docs/ir.md for the IR format.
 """
+import ast
 import json
+import re
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
@@ -59,8 +61,7 @@ FORMALIZER_PROMPT = """Translate the puzzle below into the IR format. Do not sol
 {ir_spec}
 
 Rules:
-1. Make one variable per entity that must be placed or measured (a person, an item, a letter, an event).
-   Its value is what the puzzle asks for: a position, a slot number, a digit, an amount.
+1. Make one variable for EVERY entity or letter mentioned in the puzzle (also letters that appear only in the conditions). Its value is what the puzzle asks for: a position, a slot number, a digit, an amount.
 2. If entities are matched with labels (for example people with drinks), the variable is the entity and its value
    is the number of the label. Number the labels 1, 2, 3, ... in the order they are mentioned in the puzzle.
    The same rule applies to ordered slots (days, time slots): number them 1, 2, 3, ... in time order.
@@ -68,11 +69,17 @@ Rules:
 4. Write every condition of the puzzle as a separate constraint, exactly as stated. Do not invent conditions.
 5. Also write down facts that the text relies on but does not state (the order of days, what "last", "between"
    or "directly after" mean, that a leading digit is not 0, the total number of slots, and so on).
-6. Encodings: "A is directly behind B" -> "A == B + 1"; "A is before B" -> "A < B"; "A or B" ->
-   "(X == 1) or (Y == 1)"; a multi-digit number with digits a, b, c -> "100*a + 10*b + c"; a statement S made by a
-   person P who is either a knight (always true) or a knave (always false) -> "P == (S)" with knight = 1, knave = 0.
-7. Use only the syntax listed above: "==" for equality, no "=", no words, no strings, no function except abs().
+6. Encodings (position 1 is the front): "A is in front of B" or "A is before B" -> "A < B"; "A is behind B" or "A is after B" -> "A > B";
+   "A is directly behind B" -> "A == B + 1"; "A or B" -> "(X == 1) or (Y == 1)"; a multi-digit number with digits a, b, c -> "100*a + 10*b + c"
+   (give EVERY digit its own place value); a statement S made by a person P who is either a knight (always true) or a knave
+   (always false) -> "P == (S)" with knight = 1, knave = 0.
+7. Use only the syntax listed above: "==" for equality, no "=", no words, no strings, no lists, no function except abs(). Never use max(), min() or sum().
 8. A domain [lo, hi] is a range of exactly two numbers, for example [1, 5]. To list allowed values use {{"values": [1, 2, 4]}}. Never write a list of three or more numbers directly.
+9. Variable names are single words made of letters, digits and underscores. Replace spaces by underscores: "Design review" -> Design_review.
+10. The IR contains integers only. Words such as tea, coffee or Monday never appear in domains or constraints (no quotes, no strings): replace every label by its number from rule 2, and write the domain of the variable as [1, number of labels].
+11. A superlative ("the youngest", "the smallest", "the largest", "the last") means a comparison with EVERY other variable of the group, one constraint each: if X is the youngest among A, B and C write "X < A", "X < B", "X < C" (use > for the largest). Never fix it to a constant.
+12. If time is divided into days with several slots each, give every slot its own number 1, 2, ..., N in time order, so the domain is [1, N] with N the total number of slots. The day of slot s is computed with integer division, for example (s + 1) // 2 for two slots per day.
+13. Every constraint is one short expression. Never write comments, explanations or repeated text inside the JSON.
 
 Examples:
 
@@ -85,10 +92,25 @@ IR:
   "constraints": ["Express != 1", "Regional < Intercity", "Intercity != 3"]
 }}
 
-Example 2 (with explicit domain and optimization):
-Variables with values only from a given list:
-{{"variables": {{"Year": {{"values": [1998, 2003, 2011]}}}}
+Example 2 (labels become numbers).
+Puzzle: Ann and Ben each own a different pet, a cat or a dog. Ann does not own the cat.
+IR (labels numbered in the order they are mentioned: cat = 1, dog = 2):
+{{
+  "variables": {{"Ann": [1, 2], "Ben": [1, 2]}},
+  "all_different": [["Ann", "Ben"]],
+  "constraints": ["Ann != 1"]
+}}
 
+Example 3 (days and slots).
+Puzzle: Four talks P, Q, R and S are given on Thursday and Friday. Each day has a first and a second slot, and each talk takes one slot. P is on Thursday. Q is in a second slot. R is on the day after S.
+IR (slots numbered in time order: Thu first = 1, Thu second = 2, Fri first = 3, Fri second = 4; the day of slot s is (s + 1) // 2):
+{{
+  "variables": {{"P": [1, 4], "Q": [1, 4], "R": [1, 4], "S": [1, 4]}},
+  "all_different": [["P", "Q", "R", "S"]],
+  "constraints": ["P <= 2", "Q % 2 == 0", "(R + 1) // 2 == (S + 1) // 2 + 1"]
+}}
+
+Example 4 (optimization).
 Choosing items within a budget: each variable 0 or 1 means "do not take / take".
 {{
   "variables": {{"Tent": [0, 1], "Stove": [0, 1], "Camera": [0, 1]}},
@@ -132,11 +154,14 @@ def validate_ir(ir: dict) -> list:
 
     for name, dom in variables.items():
         if not re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$").match(name):
-            errors.append(f"variable name {name!r} is not an identifier")
+            errors.append(f"variable name {name!r} is not an identifier; rename it using letters, digits and underscores only, "
+                          f"for example {re.sub(r'[^A-Za-z0-9_]', '_', name)!r}, and use the new name everywhere")
         if isinstance(dom, list):
             if len(dom) != 2 or not all(is_int(x) for x in dom):
                 errors.append(f"domain of {name} must be [lo, hi] with exactly two integers, got {dom!r}; "
-                              'write the range as [smallest, largest], e.g. [1, 3], or use {"values": [1, 2, 3]}')
+                              'write the range as [smallest, largest], e.g. [1, 3], or use {"values": [1, 2, 3]}. '
+                              "Only integers are allowed: replace words (tea, coffee, ...) by numbers 1, 2, 3, ... "
+                              "in the order they are mentioned and use these numbers in the constraints")
             elif dom[0] > dom[1]:
                 errors.append(f"domain of {name} is empty: lo {dom[0]} is greater than hi {dom[1]}")
         elif isinstance(dom, dict):
@@ -204,8 +229,7 @@ def run_solver(ir: dict) -> dict:
     several solutions exist. Think about what limit you need to tell "unique" from "multiple".
     """
 
-
-    return ir_solver.solve(ir, limit=1)
+    return ir_solver.solve(ir, limit=2)
 
 
 PRESENT_PROMPT = """A puzzle has been solved by a constraint solver. Rewrite the solver's result in the required
