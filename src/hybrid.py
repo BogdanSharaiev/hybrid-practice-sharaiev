@@ -203,6 +203,8 @@ def run_solver(ir: dict) -> dict:
     TODO(team): with limit=1 the solver stops after the first solution, so it reports "unique" even when
     several solutions exist. Think about what limit you need to tell "unique" from "multiple".
     """
+
+
     return ir_solver.solve(ir, limit=1)
 
 
@@ -249,11 +251,15 @@ def solve(problem: dict) -> dict:
     # TODO(team): if `errors` is not empty, make ONE more attempt:
     #   ir = formalize(problem, feedback="\n".join(errors)); errors = validate_ir(ir); record it in trace.
     if errors:
+        ir = formalize(problem, feedback="\n".join(errors))
+        errors = validate_ir(ir)
+        trace["attempts"].append({"ir": ir, "errors": errors})
+    if errors:
         raise HybridError("invalid IR: " + "; ".join(errors))
 
     try:
         result = run_solver(ir)
-    except ValueError as e:                      # the solver rejected the IR
+    except ValueError as e:  # the solver rejected the IR
         raise HybridError(f"solver rejected the IR: {e}") from e
     trace["solver"] = {"status": result["status"], "n_solutions": len(result["solutions"]),
                        "objective": result.get("objective"),
