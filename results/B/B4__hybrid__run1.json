@@ -1,0 +1,62 @@
+{
+ "problem": "B4",
+ "pipeline": "hybrid",
+ "run": 1,
+ "model": "qwen2.5:3b",
+ "timestamp": "2026-11-13T20:08:46",
+ "answer": {
+  "status": "none",
+  "solution": {},
+  "objective": null
+ },
+ "trace": {
+  "attempts": [
+   {
+    "ir": {
+     "variables": {
+      "Ivan": [
+       1,
+       30
+      ],
+      "Kateryna": [
+       1,
+       30
+      ],
+      "Taras": [
+       1,
+       30
+      ],
+      "Sofiia": [
+       1,
+       30
+      ]
+     },
+     "all_different": [
+      [
+       "Ivan",
+       "Kateryna",
+       "Taras",
+       "Sofiia"
+      ]
+     ],
+     "constraints": [
+      "Kateryna == 2 * Taras",
+      "Ivan == Kateryna + 3",
+      "Sofiia == 1",
+      "Ivan + Kateryna + Taras + Sofiia == 43"
+     ]
+    },
+    "errors": []
+   }
+  ],
+  "solver": {
+   "status": "none",
+   "n_solutions": 0,
+   "objective": null,
+   "first_solution": null
+  }
+ },
+ "error": null,
+ "seconds": 2.3,
+ "llm_calls": 1
+}

@@ -1,0 +1,80 @@
+{
+ "problem": "B1",
+ "pipeline": "hybrid",
+ "run": 1,
+ "model": "qwen2.5:3b",
+ "timestamp": "2026-11-13T20:07:44",
+ "answer": {
+  "status": "multiple",
+  "solution": {
+   "Artem": 3,
+   "Bohdana": 2,
+   "Viktor": 4,
+   "Halyna": 1,
+   "Dmytro": 5
+  },
+  "objective": null
+ },
+ "trace": {
+  "attempts": [
+   {
+    "ir": {
+     "variables": {
+      "Artem": [
+       1,
+       5
+      ],
+      "Bohdana": [
+       1,
+       5
+      ],
+      "Viktor": [
+       1,
+       5
+      ],
+      "Halyna": [
+       1,
+       5
+      ],
+      "Dmytro": [
+       1,
+       5
+      ]
+     },
+     "all_different": [
+      [
+       "Artem",
+       "Bohdana",
+       "Viktor",
+       "Halyna",
+       "Dmytro"
+      ]
+     ],
+     "constraints": [
+      "Viktor > Halyna",
+      "Artem == Bohdana + 1",
+      "Dmytro == 1 or Dmytro == 5",
+      "Halyna != 5",
+      "Bohdana != 1"
+     ]
+    },
+    "errors": []
+   }
+  ],
+  "solver": {
+   "status": "multiple",
+   "n_solutions": 2,
+   "objective": null,
+   "first_solution": {
+    "Artem": 3,
+    "Bohdana": 2,
+    "Viktor": 4,
+    "Halyna": 1,
+    "Dmytro": 5
+   }
+  }
+ },
+ "error": null,
+ "seconds": 4.3,
+ "llm_calls": 2
+}
