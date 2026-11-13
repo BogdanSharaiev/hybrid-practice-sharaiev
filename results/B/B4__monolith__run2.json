@@ -1,0 +1,23 @@
+{
+ "problem": "B4",
+ "pipeline": "monolith",
+ "run": 2,
+ "model": "qwen2.5:3b",
+ "timestamp": "2026-11-13T20:08:39",
+ "answer": {
+  "status": "unique",
+  "solution": {
+   "Ivan": 17,
+   "Kateryna": 14,
+   "Taras": 7,
+   "Sofiia": 3
+  },
+  "objective": null
+ },
+ "trace": {
+  "reasoning": "Let's denote the ages of Ivan, Kateryna, Taras, and Sofiia as I, K, T, and S respectively. From the conditions given, we have the following equations and constraints: 1. K = 2T 2. I = K + 3 3. S is the smallest of the four ages 4. I + K + T + S = 43. Substituting K and I from conditions 1 and 2 into condition 4, we get (2T + 3) + 2T + T + S = 43, which simplifies to 5T + S = 40. Since S is the smallest, let's start with the smallest possible value for S, which is 1. Then, 5T + 1 = 40, so T = 7. Then, K = 2T = 14, and I = K + 3 = 17. This gives us S = 40 - 5*7 - 1 = 40 - 36 = 4. However, this does not satisfy the condition that S is the youngest. Let's try S = 2. Then, 5T + 2 = 40, so T = 7. Then, K = 2T = 14, and I = K + 3 = 17. This gives us S = 40 - 5*7 - 2 = 40 - 37 = 3. This satisfies all conditions. Therefore, the solution is I = 17, K = 14, T = 7, S = 3. This is the only solution that satisfies all conditions."
+ },
+ "error": null,
+ "seconds": 6.2,
+ "llm_calls": 1
+}

@@ -1,0 +1,74 @@
+{
+ "problem": "B3",
+ "pipeline": "hybrid",
+ "run": 1,
+ "model": "qwen2.5:3b",
+ "timestamp": "2026-11-13T20:08:29",
+ "answer": {
+  "status": "none",
+  "solution": {},
+  "objective": null
+ },
+ "trace": {
+  "attempts": [
+   {
+    "ir": {
+     "variables": {
+      "Planning": [
+       1,
+       3
+      ],
+      "Design_review": [
+       1,
+       3
+      ],
+      "Budget": [
+       1,
+       3
+      ],
+      "Hiring": [
+       1,
+       3
+      ],
+      "Security_review": [
+       1,
+       3
+      ],
+      "Retro": [
+       1,
+       3
+      ]
+     },
+     "all_different": [
+      [
+       "Planning",
+       "Design_review",
+       "Budget",
+       "Hiring",
+       "Security_review",
+       "Retro"
+      ]
+     ],
+     "constraints": [
+      "Retro == 3",
+      "(Planning == 1) or (Design_review == 1)",
+      "Budget == (Planning + 1)",
+      "Security_review == (Budget + 1)",
+      "Hiring != 1",
+      "Budget != Planning"
+     ]
+    },
+    "errors": []
+   }
+  ],
+  "solver": {
+   "status": "none",
+   "n_solutions": 0,
+   "objective": null,
+   "first_solution": null
+  }
+ },
+ "error": null,
+ "seconds": 2.7,
+ "llm_calls": 1
+}

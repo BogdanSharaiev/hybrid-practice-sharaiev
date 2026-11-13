@@ -1,0 +1,13 @@
+{
+ "problem": "B2",
+ "pipeline": "hybrid",
+ "run": 2,
+ "model": "qwen2.5:3b",
+ "timestamp": "2026-11-13T20:08:11",
+ "answer": null,
+ "trace": null,
+ "error": "HybridError: invalid IR: constraint 'A == max([N, O, D, E, G, R, P, H, N, D, G, R, E, P])': only abs() is allowed",
+ "traceback": "Traceback (most recent call last):\n  File \"C:\\test_pz1\\hybrid-practice\\src\\run.py\", line 41, in run_one\n    out = PIPELINES[name].solve(problem)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\test_pz1\\hybrid-practice\\src\\hybrid.py\", line 320, in solve\n    raise HybridError(\"invalid IR: \" + \"; \".join(errors))\nhybrid.HybridError: invalid IR: constraint 'A == max([N, O, D, E, G, R, P, H, N, D, G, R, E, P])': only abs() is allowed\n",
+ "seconds": 8.9,
+ "llm_calls": 2
+}

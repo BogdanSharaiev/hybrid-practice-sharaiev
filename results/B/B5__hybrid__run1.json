@@ -1,0 +1,13 @@
+{
+ "problem": "B5",
+ "pipeline": "hybrid",
+ "run": 1,
+ "model": "qwen2.5:3b",
+ "timestamp": "2026-11-13T20:08:58",
+ "answer": null,
+ "trace": null,
+ "error": "HybridError: invalid IR: domain of Olena must be {\"values\": [integers]}, got {'values': ['coffee', 'juice']}; domain of Petro must be {\"values\": [integers]}, got {'values': ['tea', 'juice']}; domain of Maria must be {\"values\": [integers]}, got {'values': ['tea', 'coffee']}",
+ "traceback": "Traceback (most recent call last):\n  File \"C:\\test_pz1\\hybrid-practice\\src\\run.py\", line 41, in run_one\n    out = PIPELINES[name].solve(problem)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\test_pz1\\hybrid-practice\\src\\hybrid.py\", line 320, in solve\n    raise HybridError(\"invalid IR: \" + \"; \".join(errors))\nhybrid.HybridError: invalid IR: domain of Olena must be {\"values\": [integers]}, got {'values': ['coffee', 'juice']}; domain of Petro must be {\"values\": [integers]}, got {'values': ['tea', 'juice']}; domain of Maria must be {\"values\": [integers]}, got {'values': ['tea', 'coffee']}\n",
+ "seconds": 3.5,
+ "llm_calls": 2
+}
