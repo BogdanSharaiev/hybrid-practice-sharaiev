@@ -50,36 +50,38 @@ Variable names must be identifiers: letters, digits and underscores only, no spa
 
 SYSTEM = "You translate logic puzzles into a formal constraint representation. You answer only with JSON."
 
-# TODO(team): this prompt is the heart of the hybrid pipeline. Things worth considering:
-#   * how should the model choose variables? (one variable per entity? per attribute value?)
-#   * how should it encode positions, days, "morning/afternoon", "next to", "between", "at most"?
-#   * facts that the text does not state but that the model must know (calendar, working week, ...);
-#   * a worked example (few-shot) on a puzzle that is NOT in your set;
-#   * how to encode knights and knaves: a statement S by person X becomes  X == (S).
 FORMALIZER_PROMPT = """Translate the puzzle below into the IR format. Do not solve the puzzle.
 
 {ir_spec}
 
 Rules:
-1. Make one variable for EVERY entity or letter mentioned in the puzzle (also letters that appear only in the conditions). Its value is what the puzzle asks for: a position, a slot number, a digit, an amount.
-2. If entities are matched with labels (for example people with drinks), the variable is the entity and its value
-   is the number of the label. Number the labels 1, 2, 3, ... in the order they are mentioned in the puzzle.
-   The same rule applies to ordered slots (days, time slots): number them 1, 2, 3, ... in time order.
-3. If the puzzle says that entities take different values, add them to all_different.
-4. Write every condition of the puzzle as a separate constraint, exactly as stated. Do not invent conditions.
-5. Also write down facts that the text relies on but does not state (the order of days, what "last", "between"
-   or "directly after" mean, that a leading digit is not 0, the total number of slots, and so on).
-6. Encodings (position 1 is the front): "A is in front of B" or "A is before B" -> "A < B"; "A is behind B" or "A is after B" -> "A > B";
-   "A is directly behind B" -> "A == B + 1"; "A or B" -> "(X == 1) or (Y == 1)"; a multi-digit number with digits a, b, c -> "100*a + 10*b + c"
-   (give EVERY digit its own place value); a statement S made by a person P who is either a knight (always true) or a knave
-   (always false) -> "P == (S)" with knight = 1, knave = 0.
-7. Use only the syntax listed above: "==" for equality, no "=", no words, no strings, no lists, no function except abs(). Never use max(), min() or sum().
-8. A domain [lo, hi] is a range of exactly two numbers, for example [1, 5]. To list allowed values use {{"values": [1, 2, 4]}}. Never write a list of three or more numbers directly.
-9. Variable names are single words made of letters, digits and underscores. Replace spaces by underscores: "Design review" -> Design_review.
-10. The IR contains integers only. Words such as tea, coffee or Monday never appear in domains or constraints (no quotes, no strings): replace every label by its number from rule 2, and write the domain of the variable as [1, number of labels].
-11. A superlative ("the youngest", "the smallest", "the largest", "the last") means a comparison with EVERY other variable of the group, one constraint each: if X is the youngest among A, B and C write "X < A", "X < B", "X < C" (use > for the largest). Never fix it to a constant.
-12. If time is divided into days with several slots each, give every slot its own number 1, 2, ..., N in time order, so the domain is [1, N] with N the total number of slots. The day of slot s is computed with integer division, for example (s + 1) // 2 for two slots per day.
-13. Every constraint is one short expression. Never write comments, explanations or repeated text inside the JSON.
+1. VARIABLES. Make one variable for EVERY entity or letter mentioned in the puzzle, also letters that appear only in the conditions.
+   Its value is what the puzzle asks for: a position, a slot number, a digit, an amount.
+2. LABELS AND SLOTS. If entities are matched with labels (people with drinks), the variable is the entity and its value is the
+   number of the label: number the labels 1, 2, 3, ... in the order they are mentioned. Ordered slots (days, time slots) are numbered
+   1, 2, 3, ... in time order. The domain is then [1, number of labels or slots].
+3. EVERY CLAUSE. Write each condition of the puzzle as a separate constraint, exactly as stated. Do not invent conditions.
+   Add facts the text relies on but does not state: the order of days, what "last" or "between" mean, that a leading digit is not 0,
+   the total number of slots. Use all_different when entities must take different values.
+4. ENCODINGS (position 1 is the front).
+   - "A is in front of B" or "A is before B": "A < B". "A is behind B" or "A is after B": "A > B".
+   - "A is directly behind B": "A == B + 1". "A is next to B": "abs(A - B) == 1".
+   - "A is between B and C": "((B < A) and (A < C)) or ((C < A) and (A < B))". "at most k": "<= k". "at least k": ">= k".
+   - "either A is first or B is first": "(A == 1) or (B == 1)".
+   - A superlative ("the youngest", "the heaviest", "the last") is a comparison with EVERY other variable of the group, one
+     constraint each, never a fixed number: if X is the smallest among X, Y and Z write "X < Y" and "X < Z".
+   - A number with digits a, b, c is "100*a + 10*b + c": give EVERY digit its own place value.
+   - Days with k slots each: number all slots 1, 2, ..., N in time order. The day of slot s is "(s - 1) // k + 1".
+   - A statement S made by a person P who is either a knight (always true) or a knave (always false) is "P == (S)",
+     with knight = 1 and knave = 0.
+5. FORMAT. Integers only: words such as tea or Monday never appear in domains or constraints (no quotes, no strings), replace them by
+   their numbers from rule 2. A domain is [lo, hi] with exactly two numbers: for 3 labels write [1, 3], never [1, 2, 3].
+   For a list of allowed values use {{"values": [1, 2, 4]}}. Variable names are single words of letters, digits and underscores:
+   "Design review" becomes Design_review. Use only the syntax listed above: "==" for equality, never "=", and no max(), min(),
+   sum(), lists or other functions except abs(). Every constraint is one short expression. Never write comments or repeated text.
+   Add "objective" only if the puzzle asks to maximize or minimize something.
+6. CHECK before you answer (do not write the check): every name used in a constraint is declared in "variables"; every domain has two
+   numbers; every clause of the puzzle has its own constraint.
 
 Examples:
 
@@ -101,23 +103,6 @@ IR (labels numbered in the order they are mentioned: cat = 1, dog = 2):
   "constraints": ["Ann != 1"]
 }}
 
-Example 3 (days and slots).
-Puzzle: Four talks P, Q, R and S are given on Thursday and Friday. Each day has a first and a second slot, and each talk takes one slot. P is on Thursday. Q is in a second slot. R is on the day after S.
-IR (slots numbered in time order: Thu first = 1, Thu second = 2, Fri first = 3, Fri second = 4; the day of slot s is (s + 1) // 2):
-{{
-  "variables": {{"P": [1, 4], "Q": [1, 4], "R": [1, 4], "S": [1, 4]}},
-  "all_different": [["P", "Q", "R", "S"]],
-  "constraints": ["P <= 2", "Q % 2 == 0", "(R + 1) // 2 == (S + 1) // 2 + 1"]
-}}
-
-Example 4 (optimization).
-Choosing items within a budget: each variable 0 or 1 means "do not take / take".
-{{
-  "variables": {{"Tent": [0, 1], "Stove": [0, 1], "Camera": [0, 1]}},
-  "constraints": ["4*Tent + 3*Stove + 5*Camera <= 8"],
-  "objective": {{"maximize": "7*Tent + 4*Stove + 6*Camera"}}
-}}
-
 Now the real puzzle. Answer with the IR JSON only.
 
 Puzzle:
@@ -132,103 +117,164 @@ def formalize(problem: dict, feedback: Optional[str] = None) -> dict:
     parsed, raw = llm.ask_json(prompt, IRModel, system=SYSTEM)
     return parsed.model_dump(exclude_none=True)
 
+
 def is_int(x) -> bool:
     return isinstance(x, int) and not isinstance(x, bool)
 
-def validate_ir(ir: dict) -> list:
-    """Return a list of human-readable error messages; an empty list means the IR is valid.
 
-    TODO(team). Things to check:
-      * every domain is [lo, hi] with lo <= hi, or {"values": [...]} with integers;
-      * every name used in all_different / constraints / objective is a declared variable;
-      * every constraint parses and uses only allowed syntax.
-    Hint: ir_solver.build(ir) raises ValueError with a readable message for unknown variables and
-    unsupported syntax - you can call it inside try/except and turn the exception into an error message.
-    """
-    errors = []
+def validate_ir(ir: dict) -> list:
     if not isinstance(ir, dict):
         return ["the IR must be a JSON object"]
+
+    errors = []
+    allowed_keys = {"variables", "all_different", "constraints", "objective"}
+    extra_keys = set(ir) - allowed_keys
+    if extra_keys:
+        errors.append(
+            f"unknown IR field(s): {', '.join(sorted(map(str, extra_keys)))}"
+        )
+
     variables = ir.get("variables")
     if not isinstance(variables, dict) or not variables:
-        return ['"variables" must be a non-empty object {name: domain}']
+        return errors + ['"variables" must be a non-empty object {name: domain}']
 
     for name, dom in variables.items():
-        if not re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$").match(name):
-            errors.append(f"variable name {name!r} is not an identifier; rename it using letters, digits and underscores only, "
-                          f"for example {re.sub(r'[^A-Za-z0-9_]', '_', name)!r}, and use the new name everywhere")
+        if not isinstance(name, str) or not re.fullmatch(
+            r"[A-Za-z_][A-Za-z0-9_]*", name
+        ):
+            errors.append(
+                f"variable name {name!r} is not an identifier; "
+                "use letters, digits and underscores, starting with a letter or underscore"
+            )
+            continue
+
         if isinstance(dom, list):
             if len(dom) != 2 or not all(is_int(x) for x in dom):
-                errors.append(f"domain of {name} must be [lo, hi] with exactly two integers, got {dom!r}; "
-                              'write the range as [smallest, largest], e.g. [1, 3], or use {"values": [1, 2, 3]}. '
-                              "Only integers are allowed: replace words (tea, coffee, ...) by numbers 1, 2, 3, ... "
-                              "in the order they are mentioned and use these numbers in the constraints")
+                errors.append(
+                    f"domain of {name} must be [lo, hi] with exactly two integers, "
+                    f"got {dom!r}; use {{'values': [...]}} for a non-contiguous domain"
+                )
             elif dom[0] > dom[1]:
-                errors.append(f"domain of {name} is empty: lo {dom[0]} is greater than hi {dom[1]}")
+                errors.append(
+                    f"domain of {name} is empty: lo {dom[0]} is greater than hi {dom[1]}"
+                )
+
         elif isinstance(dom, dict):
+            if set(dom) != {"values"}:
+                errors.append(
+                    f'domain of {name} must contain only the "values" field, got {dom!r}'
+                )
+                continue
+
             vals = dom.get("values")
-            if not isinstance(vals, list) or not vals or not all(is_int(x) for x in vals):
-                errors.append(f'domain of {name} must be {{"values": [integers]}}, got {dom!r}')
+            if not isinstance(vals, list) or not vals or not all(
+                is_int(x) for x in vals
+            ):
+                errors.append(
+                    f'domain of {name} must be {{"values": [integers]}}, got {dom!r}'
+                )
+            elif len(vals) != len(set(vals)):
+                errors.append(
+                    f"domain of {name} contains duplicate values: {vals!r}"
+                )
         else:
-            errors.append(f"domain of {name} must be [lo, hi] or " + '{"values": [...]}' + f", got {dom!r}")
+            errors.append(
+                f"domain of {name} must be [lo, hi] or "
+                + '{"values": [...]}'
+                + f", got {dom!r}"
+            )
 
     groups = ir.get("all_different", [])
     if not isinstance(groups, list):
         errors.append('"all_different" must be a list of lists of variable names')
     else:
-        for grp in groups:
-            if not isinstance(grp, list) or not all(isinstance(g, str) for g in grp):
-                errors.append(f"all_different group {grp!r} must be a list of variable names")
+        for index, group in enumerate(groups, start=1):
+            if not isinstance(group, list) or len(group) < 2 or not all(
+                isinstance(item, str) for item in group
+            ):
+                errors.append(
+                    f"all_different group #{index} must contain at least two variable names"
+                )
                 continue
-            for g in grp:
-                if g not in variables:
-                    errors.append(f"all_different uses unknown variable: {g}")
 
-    cons = ir.get("constraints", [])
-    if not isinstance(cons, list):
+            if len(group) != len(set(group)):
+                errors.append(
+                    f"all_different group #{index} contains duplicate variable names"
+                )
+
+            for name in group:
+                if name not in variables:
+                    errors.append(f"all_different uses unknown variable: {name}")
+
+    constraints = ir.get("constraints", [])
+    if not isinstance(constraints, list):
         errors.append('"constraints" must be a list of strings')
-        cons = []
-    if errors:
-        return errors
+        constraints = []
 
-    base = {"variables": variables}
-    for c in cons:
-        if not isinstance(c, str):
-            errors.append(f"constraint {c!r} must be a string")
-            continue
-        try:
-            ir_solver.build({**base, "constraints": [c]})
-        except ValueError as e:
-            errors.append(f"constraint {c!r}: {e}")
-        except SyntaxError:
-            errors.append(f"constraint {c!r}: invalid syntax (use == for equality; only numbers, variables, "
-                          "+ - * // %, comparisons, and/or/not, abs() and parentheses are allowed)")
-        except Exception as e:  # noqa: BLE001
-            errors.append(f"constraint {c!r}: {e.__class__.__name__}: {e}")
+    structurally_valid = not any(
+        message.startswith(("variable name ", "domain of "))
+        for message in errors
+    )
 
-    obj = ir.get("objective")
-    if obj is not None:
-        if not (isinstance(obj, dict) and len(obj) == 1 and next(iter(obj)) in ("maximize", "minimize")
-                and isinstance(next(iter(obj.values())), str)):
-            errors.append('"objective" must be {"maximize": "<expression>"} or {"minimize": "<expression>"}')
-        else:
-            expr = next(iter(obj.values()))
+    if structurally_valid:
+        base = {"variables": variables}
+
+        for index, constraint in enumerate(constraints, start=1):
+            if not isinstance(constraint, str) or not constraint.strip():
+                errors.append(
+                    f"constraint #{index} must be a non-empty string"
+                )
+                continue
+
             try:
-                _, _, conv = ir_solver.build(base)
-                conv(ast.parse(expr, mode="eval"))
-            except ValueError as e:
-                errors.append(f"objective {expr!r}: {e}")
+                ir_solver.build({
+                    **base,
+                    "constraints": [constraint]
+                })
+            except ValueError as exc:
+                errors.append(f"constraint {constraint!r}: {exc}")
             except SyntaxError:
-                errors.append(f"objective {expr!r}: invalid syntax")
+                errors.append(
+                    f"constraint {constraint!r}: invalid syntax "
+                    "(use == for equality; only numbers, variables, arithmetic, "
+                    "comparisons, and/or/not, abs() and parentheses are allowed)"
+                )
+            except Exception as exc:
+                errors.append(
+                    f"constraint {constraint!r}: {exc.__class__.__name__}: {exc}"
+                )
+
+    objective = ir.get("objective")
+    if objective is not None:
+        if not (
+            isinstance(objective, dict)
+            and len(objective) == 1
+            and next(iter(objective), None) in ("maximize", "minimize")
+            and isinstance(next(iter(objective.values()), None), str)
+            and next(iter(objective.values())).strip()
+        ):
+            errors.append(
+                '"objective" must be {"maximize": "<expression>"} '
+                'or {"minimize": "<expression>"}'
+            )
+        elif structurally_valid:
+            expression = next(iter(objective.values()))
+            try:
+                _, _, convert = ir_solver.build({"variables": variables})
+                convert(ast.parse(expression, mode="eval"))
+            except ValueError as exc:
+                errors.append(f"objective {expression!r}: {exc}")
+            except SyntaxError:
+                errors.append(f"objective {expression!r}: invalid syntax")
+            except Exception as exc:
+                errors.append(
+                    f"objective {expression!r}: {exc.__class__.__name__}: {exc}"
+                )
+
     return errors
 
 
 def run_solver(ir: dict) -> dict:
-    """Run Z3 on the IR. Returns {"status": ..., "solutions": [...], "objective": ...}.
-
-    TODO(team): with limit=1 the solver stops after the first solution, so it reports "unique" even when
-    several solutions exist. Think about what limit you need to tell "unique" from "multiple".
-    """
-
     return ir_solver.solve(ir, limit=2)
 
 
@@ -248,12 +294,6 @@ Solver assignment (variable -> value):
 
 
 def present(problem: dict, ir: dict, result: dict) -> dict:
-    """Turn the solver result into the required answer format.
-
-    Provided baseline: the model translates the assignment. This is a weak point - the model can
-    introduce errors AFTER the solver. Status and objective are always taken from the solver, never
-    from the model. Extension: write deterministic code for problem types where the mapping is obvious.
-    """
     status = result["status"]
     if status == "none":
         return Answer(status="none").model_dump()
@@ -272,8 +312,6 @@ def solve(problem: dict) -> dict:
     errors = validate_ir(ir)
     trace["attempts"].append({"ir": ir, "errors": errors})
 
-    # TODO(team): if `errors` is not empty, make ONE more attempt:
-    #   ir = formalize(problem, feedback="\n".join(errors)); errors = validate_ir(ir); record it in trace.
     if errors:
         ir = formalize(problem, feedback="\n".join(errors))
         errors = validate_ir(ir)
